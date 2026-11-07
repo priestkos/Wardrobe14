@@ -1,0 +1,26 @@
+<Project Sdk="Dalamud.NET.Sdk/15.0.0">
+  <PropertyGroup>
+    <Version>0.1.0</Version>
+    <Description>Penumbra mod management: see and toggle mods across collections. Read-only preview build (M0/M1).</Description>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Wardrobe14.Tests/**" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Penumbra.Api" Version="5.19.2" />
+    <PackageReference Include="Glamourer.Api" Version="2.8.2" />
+  </ItemGroup>
+  <PropertyGroup>
+    <Author>PriestKos</Author>
+    <Authors>PriestKos</Authors>
+    <Name>Wardrobe14</Name>
+    <Punchline>Penumbra mod management across collections, with Glamourer looks.</Punchline>
+    <RepoUrl>https://github.com/priestkos/Wardrobe14</RepoUrl>
+    <Tags>penumbra;glamourer;mods;utility;ui</Tags>
+  </PropertyGroup>
+</Project>
