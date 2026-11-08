@@ -162,9 +162,8 @@ jobs:
             $dllEntries = @($archive.Entries | Where-Object { $_.Name -like '*.dll' })
             if ($dllEntries.Count -eq 0) { throw 'No plugin .dll found inside latest.zip' }
 
-            [xml]$proj = Get-Content -LiteralPath 'Wardrobe14.csproj'
-            $assemblyBase = ($proj.Project.PropertyGroup | ForEach-Object { $_.Name } | Where-Object { $_ } | Select-Object -First 1)
-            if (-not $assemblyBase) { $assemblyBase = 'Wardrobe14' }
+            # The zip also carries Penumbra.Api/Glamourer.Api DLLs, so the plugin DLL must be picked by name, never "first DLL".
+            $assemblyBase = 'Wardrobe14'
             $preferredDll = "$assemblyBase.dll"
             $dllEntry = $dllEntries | Where-Object { $_.Name -eq $preferredDll } | Select-Object -First 1
             if (-not $dllEntry) { $dllEntry = $dllEntries | Select-Object -First 1 }
