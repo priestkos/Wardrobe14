@@ -10,6 +10,7 @@ permissions:
 
 jobs:
   build:
+    needs: tests
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v7
