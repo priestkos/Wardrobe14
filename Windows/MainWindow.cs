@@ -18,6 +18,9 @@ public sealed class MainWindow : Window
     private List<string> folders = [];
     private Dictionary<Guid, string> collectionNames = [];
     private readonly List<(Guid Id, string Label, IReadOnlyDictionary<string, ModCell> Cells)> columns = [];
+    private List<IReadOnlyDictionary<string, ModCell>> cells = [];
+    private List<ModRow> rows = [];
+    private (string, string, int, bool)? rowsKey; // filter inputs the cached rows were built from; null = rebuild
 
     private string text = string.Empty;
     private string folder = string.Empty;
@@ -87,6 +90,7 @@ public sealed class MainWindow : Window
             penumbra.ModsStale = false; // clear first, so an event during the load marks it again
             mods = penumbra.Mods();
             folders = ModGrid.Folders(mods);
+            rowsKey = null;
         }
 
         if (!penumbra.SettingsStale)
@@ -102,6 +106,8 @@ public sealed class MainWindow : Window
                 columns.Add((id, name, penumbra.Settings(id)));
         if (onInColumn >= columns.Count)
             onInColumn = -1;
+        cells = columns.Select(c => c.Cells).ToList();
+        rowsKey = null;
     }
 
     private void DrawColumnPicker()
@@ -175,8 +181,14 @@ public sealed class MainWindow : Window
 
     private void DrawGrid()
     {
-        var cells = columns.Select(c => c.Cells).ToList();
-        var rows = ModGrid.Filter(mods, cells, text, folder, onInColumn, differsOnly);
+        // 888+ mods: filter only when an input changed, not every frame.
+        var key = (text, folder, onInColumn, differsOnly);
+        if (rowsKey != key)
+        {
+            rows = ModGrid.Filter(mods, cells, text, folder, onInColumn, differsOnly);
+            rowsKey = key;
+        }
+
         ImGui.TextDisabled($"{rows.Count} of {mods.Count} mods");
 
         const ImGuiTableFlags flags = ImGuiTableFlags.ScrollY | ImGuiTableFlags.RowBg | ImGuiTableFlags.BordersInnerV
