@@ -68,4 +68,25 @@ public class ModGridTests
     [Fact]
     public void FoldersIncludeParents()
         => Assert.Equal(["Gear", "Hair", "Hair/Short"], ModGrid.Folders(Rows));
+
+    [Fact]
+    public void FoldersMergeCaseAndSkipRootMods()
+        => Assert.Equal(["Hair"], ModGrid.Folders([new("a", "A", "Hair/A"), new("b", "B", "hair/B"), new("h", "Hair", "Hair")]));
+
+    [Fact]
+    public void FolderFilterSkipsRootModNamedLikeTheFolder()
+        => Assert.Equal(["a"], Dirs(ModGrid.Filter([new("a", "A", "Hair/A"), new("h", "Hair", "Hair")], [A], "", "Hair", -1, false)));
+
+    [Fact]
+    public void MissingAndDisabledDoNotDiffer()
+    {
+        // "long" is disabled in A and has no entry in B: both are off, so not a difference.
+        Assert.DoesNotContain("long", Dirs(ModGrid.Filter(Rows, [A, B], "", "", -1, true)));
+        // Inherited-on in A vs explicit-off in B is a difference.
+        Assert.Contains("boots", Dirs(ModGrid.Filter(Rows, [A, B], "", "", -1, true)));
+    }
+
+    [Fact]
+    public void FiltersCombineAsAnd()
+        => Assert.Equal(["bob"], Dirs(ModGrid.Filter(Rows, [A, B], "b", "Hair", 1, false)));
 }
