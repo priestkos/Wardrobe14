@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Mock-up: Differs between columns</title>
+    <link rel="stylesheet" href="common.css" />
+  </head>
+  <body>
+    <div class="game-backdrop"></div>
+    <div class="mockup-banner">Mock-up</div>
+    <div class="scene-label">Differs between columns — only mods that are on in one column and off in another</div>
+    <div class="imgui-window wd" id="w" style="top: 80px; left: 260px; width: 760px; height: 520px;">
+      <div class="imgui-titlebar"><span>Wardrobe14</span><span class="close">✕</span></div>
+      <div class="imgui-body"></div>
+    </div>
+    <script src="mock.js"></script>
+    <script>
+renderWindow(document.getElementById('w'), { differs: true });
+    </script>
+  </body>
+</html>

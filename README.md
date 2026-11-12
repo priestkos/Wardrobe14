@@ -11,6 +11,26 @@ A cross-collection view of your Penumbra mods: every mod against your own collec
 > [!NOTE]
 > **Early build.** This release only **reads** from Penumbra and Glamourer. It cannot change a mod setting yet; the only thing it can trigger is a redraw of your own character. Writing features arrive in later releases, each with an automatic snapshot and undo.
 
+## Screenshots
+
+These images are **mock-ups** (HTML rendered to PNG). They are not real in-game captures and do not show the actual FFXIV client UI. Mod and collection names are made-up samples.
+
+| | |
+| --- | --- |
+| ![Mod grid mock-up](docs/screenshots/01-mod-grid.png) | **Mod grid** — every mod against your own collection (`Main (you)`) and the pinned `Gpose` and `Alt` columns, with the status line on top; hovering a cell shows its priority and whether it is inherited. |
+| ![Differs mock-up](docs/screenshots/02-differs.png) | **Differs between columns** — only the mods that are on in one column and off in another (6 of 10). |
+| ![Folder and On in mock-up](docs/screenshots/03-folder-on-in.png) | **Folder and On in \<collection\>** — the folder list includes parent folders; `Gear` plus **On in Gpose** leaves 2 of 10 mods. |
+| ![Add collection mock-up](docs/screenshots/04-add-collection.png) | **Columns** — **+ Add collection** lists the collections not yet shown; `x` on a pinned button removes it. The text filter here is `sample`. |
+| ![Probe mock-up](docs/screenshots/05-probe.png) | **`/pmm probe`** — API versions, then mod and collection counts, read timings and your collection, printed to chat. |
+| ![Penumbra missing mock-up](docs/screenshots/06-penumbra-missing.png) | **Penumbra not loaded** — the status line turns red and the window shows nothing else; `/pmm probe` prints only its first line. |
+
+## Mock-up video
+
+A short **mock-up** walkthrough (not real gameplay) goes through the mod grid, the Differs, folder and On in filters, `/pmm probe` and the Penumbra-missing state, with bottom captions. The gold **Mock-up** label stays visible for the whole clip.
+
+- [mockup-walkthrough.mp4](docs/videos/mockup-walkthrough.mp4) (H.264, 1280×720, ~15 s)
+- [mockup-walkthrough.gif](docs/videos/mockup-walkthrough.gif) (preview)
+
 ## What it does
 
 - **Mod grid across collections.** One row per installed mod, showing its name and Penumbra folder. There is one column for the collection your character is using, marked `(you)`, plus one column for each collection you pin. Penumbra's own window shows one collection at a time. Here you can see the same mod in several collections side by side.
@@ -112,4 +132,5 @@ Ipc/GlamourerIpc.cs     Glamourer availability and version check
 Logic/ModGrid.cs        pure row model, filters and folder list
 Windows/MainWindow.cs   status line, column picker, filters, mod grid
 Wardrobe14.Tests/       xUnit tests for Logic/ModGrid.cs
+docs/                   mock-up screenshots and walkthrough video
 ```

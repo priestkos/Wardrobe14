@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Wardrobe14 mock-up walkthrough</title>
+    <link rel="stylesheet" href="../../screenshots/src/common.css" />
+    <style>
+      .scene { position: absolute; inset: 0; opacity: 0; will-change: transform, opacity; }
+
+      .video-caption {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 9000;
+        padding: 14px 20px;
+        font-size: 15px;
+        font-weight: 600;
+        text-align: center;
+        color: #fff;
+        background: linear-gradient(0deg, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.5) 70%, transparent 100%);
+        text-shadow: 0 1px 4px #000;
+      }
+
+      .mockup-banner { font-size: 14px; padding: 8px 16px; }
+
+      /* clear of the bottom caption */
+      .chat-panel { bottom: 96px; width: 900px; }
+      .chat-hint { bottom: 76px; }
+      .chat-line { opacity: 0; }
+
+      .press { filter: brightness(1.5); }
+
+      #mock-cursor {
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 8500;
+        width: 26px;
+        height: 26px;
+        opacity: 0;
+        filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.85));
+      }
+    </style>
+  </head>
+  <body>
+    <div class="game-backdrop"></div>
+    <div class="mockup-banner">Mock-up</div>
+
+    <!-- Main window: grid, hover, Differs, folder and On-in filters -->
+    <div id="scene1" class="scene">
+      <div class="imgui-window wd" id="w" style="top: 70px; left: 260px; width: 760px; height: 520px">
+        <div class="imgui-titlebar"><span>Wardrobe14</span><span class="close">✕</span></div>
+        <div class="imgui-body"></div>
+      </div>
+    </div>
+
+    <!-- /pmm probe -->
+    <div id="scene2" class="scene">
+      <div class="chat-panel" id="probe-chat"></div>
+      <div class="chat-hint">Illustrative chat lines — not a real client log</div>
+    </div>
+
+    <!-- Penumbra missing -->
+    <div id="scene3" class="scene">
+      <div class="imgui-window wd" id="w-missing" style="top: 70px; left: 260px; width: 760px; height: 520px">
+        <div class="imgui-titlebar"><span>Wardrobe14</span><span class="close">✕</span></div>
+        <div class="imgui-body"></div>
+      </div>
+    </div>
+
+    <div class="video-caption" id="caption"></div>
+    <svg id="mock-cursor" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 3L5 19L9 15L13 21L15 20L11 14L17 14L5 3Z" fill="#fff" stroke="#1a1a1a" stroke-width="1.2" stroke-linejoin="round" />
+    </svg>
+
+    <script src="../../screenshots/src/mock.js"></script>
+    <script>
+      const scenes = [
+        { id: "scene1", start: 0, end: 10.4 },
+        { id: "scene2", start: 10.0, end: 12.9 },
+        { id: "scene3", start: 12.5, end: 15.0 },
+      ];
+
+      // One caption per beat, each naming a real screen or feature.
+      const captions = [
+        { until: 4.0, text: "Mod grid — every mod against your collection (you) and each pinned one; hover a cell for its priority" },
+        { until: 6.4, text: "Differs between columns — only mods that are on in one column and off in another" },
+        { until: 10.2, text: "Folder filter (parents included) and On in <collection>" },
+        { until: 12.7, text: "/pmm probe — read-only API versions, counts and read timings in chat" },
+        { until: 99, text: "Penumbra not loaded — the status line turns red and the grid stays hidden" },
+      ];
+
+      // Window state by time (MainWindow.DrawFilters inputs); rows come from mock.js filterRows (ModGrid.Filter).
+      const states = [
+        { t: 0, s: {} },
+        { t: 2.0, s: { tip: [0, 1] } },
+        { t: 3.8, s: {} },
+        { t: 4.4, s: { differs: true } },
+        { t: 6.4, s: {} },
+        { t: 7.0, s: { popup: "folder" } },
+        { t: 7.4, s: { popup: "folder", hover: "Gear" } },
+        { t: 7.8, s: { folder: "Gear" } },
+        { t: 8.5, s: { folder: "Gear", popup: "onin" } },
+        { t: 8.9, s: { folder: "Gear", popup: "onin", hover: "On in Gpose" } },
+        { t: 9.3, s: { folder: "Gear", onIn: 1 } },
+      ];
+
+      const clicks = [
+        { t: 4.4, sel: "#cb-differs" },
+        { t: 6.4, sel: "#cb-differs" },
+        { t: 7.0, sel: "#c-folder" },
+        { t: 7.8, sel: '[data-item="Gear"]' },
+        { t: 8.5, sel: "#c-onin" },
+        { t: 9.3, sel: '[data-item="On in Gpose"]' },
+      ];
+      const cursorPath = [
+        { t: 0.3, at: [700, 520] },
+        { t: 1.8, sel: "#cell-0-1" },
+        { t: 3.6, sel: "#cell-0-1" },
+        { t: 4.3, sel: "#cb-differs" },
+        { t: 6.3, sel: "#cb-differs" },
+        { t: 6.9, sel: "#c-folder" },
+        { t: 7.35, sel: '[data-item="Gear"]', at: [500, 234] },
+        { t: 7.7, sel: '[data-item="Gear"]', at: [500, 234] },
+        { t: 8.4, sel: "#c-onin" },
+        { t: 9.2, sel: '[data-item="On in Gpose"]', at: [688, 234] },
+        { t: 9.8, at: [800, 420] },
+      ];
+      const cursorVisible = (t) => t >= 0.3 && t <= 10.0;
+
+      const ease = (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+      const easeOut = (x) => 1 - Math.pow(1 - x, 3);
+      const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+
+      function sceneMotion(t, start, end) {
+        const fade = 0.45;
+        if (t < start || t > end) return { opacity: 0, ty: t < start ? 14 : -10 };
+        if (start > 0 && t < start + fade) {
+          const e = easeOut((t - start) / fade);
+          return { opacity: e, ty: 14 * (1 - e) };
+        }
+        if (end < 15 && t > end - fade) {
+          const e = easeOut((end - t) / fade);
+          return { opacity: e, ty: -10 * (1 - e) };
+        }
+        return { opacity: 1, ty: 0 };
+      }
+
+      // Popup items exist only while their popup is open; fall back to the fixed point measured when open.
+      function point(k) {
+        const el = k.sel && document.querySelector(k.sel);
+        if (!el) return k.at;
+        const r = el.getBoundingClientRect();
+        return [r.left + Math.min(r.width / 2, 40), r.top + r.height / 2];
+      }
+
+      function cursorAt(t) {
+        if (t <= cursorPath[0].t) return point(cursorPath[0]);
+        for (let i = 0; i < cursorPath.length - 1; i++) {
+          const a = cursorPath[i];
+          const b = cursorPath[i + 1];
+          if (t <= b.t) {
+            const p = ease((t - a.t) / (b.t - a.t));
+            const [ax, ay] = point(a);
+            const [bx, by] = point(b);
+            return [ax + (bx - ax) * p, ay + (by - ay) * p];
+          }
+        }
+        return point(cursorPath[cursorPath.length - 1]);
+      }
+
+      const probe = probeLines();
+      document.getElementById("probe-chat").innerHTML = probe.map((l, i) => `<div class="chat-line echo" data-at="${10.6 + i * 0.5}">${esc(l)}</div>`).join("");
+      renderWindow(document.getElementById("w-missing"), { penumbra: "Penumbra not loaded" });
+
+      window.seekWalkthrough = function (t) {
+        for (const s of scenes) {
+          const { opacity, ty } = sceneMotion(t, s.start, s.end);
+          const el = document.getElementById(s.id);
+          el.style.opacity = String(opacity);
+          el.style.transform = `translateY(${ty}px)`;
+        }
+        document.getElementById("caption").textContent = captions.find((c) => t < c.until).text;
+
+        renderWindow(document.getElementById("w"), states.filter((x) => t >= x.t).pop().s);
+        for (const c of clicks) {
+          const el = document.querySelector(c.sel);
+          if (el && t >= c.t && t < c.t + 0.15) el.classList.add("press");
+        }
+
+        for (const line of document.querySelectorAll("#probe-chat .chat-line")) {
+          line.style.opacity = String(easeOut(clamp((t - parseFloat(line.dataset.at)) / 0.28, 0, 1)));
+        }
+
+        const cursor = document.getElementById("mock-cursor");
+        const [x, y] = cursorAt(t);
+        cursor.style.opacity = cursorVisible(t) ? "1" : "0";
+        cursor.style.transform = `translate(${x - 5}px, ${y - 3}px)`;
+      };
+
+      seekWalkthrough(0);
+    </script>
+  </body>
+</html>
